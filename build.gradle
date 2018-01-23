@@ -1,15 +1,3 @@
-// plugins {
-// 	id 'io.franzbecker.gradle-lombok' version '1.11'
-// 	id 'java'
-// }
-
-
-// lombok {
-// 	version = "1.16.20" 
-// 	sha256 = ""
-// }
-
-
 buildscript {
     repositories {
         mavenCentral()
@@ -42,7 +30,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-	compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
