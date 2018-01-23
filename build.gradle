@@ -1,17 +1,33 @@
+// plugins {
+// 	id 'io.franzbecker.gradle-lombok' version '1.11'
+// 	id 'java'
+// }
+
+
+// lombok {
+// 	version = "1.16.20" 
+// 	sha256 = ""
+// }
+
+
 buildscript {
-	repositories {
-		jcenter()
-		maven { url 'http://repo.spring.io/snapshot' }
-		maven { url 'http://repo.spring.io/milestone' }
-	}
-	dependencies {
-		classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.BUILD-SNAPSHOT'
-	}
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+    }
+}
+
+plugins {
+	id 'io.franzbecker.gradle-lombok' version '1.11'
+	id 'java'
 }
 
 apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
 
 jar {
 	baseName = 'lunch-orders'
@@ -19,12 +35,15 @@ jar {
 }
 
 repositories {
-	jcenter()
-	maven { url "http://repo.spring.io/snapshot" }
-	maven { url "http://repo.spring.io/milestone" }
+    mavenCentral()
 }
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
 	compile("org.springframework.boot:spring-boot-starter-web")
-	testCompile("org.springframework.boot:spring-boot-starter-test")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
 }
