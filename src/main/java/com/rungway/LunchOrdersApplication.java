@@ -21,13 +21,11 @@ public class LunchOrdersApplication {
 
     @EventListener(ApplicationReadyEvent.class)
     public void bootstrapData() {
-
         List<Order> orders = new ArrayList<>(Arrays.asList(
                 new Order("Endre", "Thai Green Curry"),
                 new Order("Rohith", "Spicy Chicken Pad Thai"),
                 new Order("Ana", "Prawn Pad Thai"),
                 new Order("HarryD", "Chilli Chicken Fried Rice")));
-
 
         repo.save(new Restaurant(
                 "spicy-basil",
