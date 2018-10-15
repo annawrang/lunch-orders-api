@@ -1,17 +1,18 @@
 package com.rungway.domain;
 
-import java.util.Map;
-import org.springframework.data.annotation.Id;
 import lombok.Data;
 import lombok.NonNull;
+import org.springframework.data.annotation.Id;
+
+import java.util.List;
 
 @Data
 public class Restaurant {
 
-    @Id @NonNull
+    @Id
+    @NonNull
     private String slug;
 
     @NonNull
-    private Map<String, String> orders;
-
+    private List<Order> orders;
 }

@@ -1,14 +1,17 @@
 package com.rungway;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.*;
-import org.springframework.boot.autoconfigure.*;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import com.rungway.domain.Order;
 import com.rungway.domain.Restaurant;
 import com.rungway.repositories.RestaurantRepository;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootApplication
 public class LunchOrdersApplication {
@@ -18,15 +21,15 @@ public class LunchOrdersApplication {
 
     @EventListener(ApplicationReadyEvent.class)
     public void bootstrapData() {
-        Map<String, String> orders = new HashMap<>();
-        orders.put("Endre", "Thai Green Curry");
-        orders.put("Rohith", "Spidy Chicken Pad Thai");
-        orders.put("Ana", "Prawn Pad Thai");
-        orders.put("HarryD", "Chilli Chicken Fried Rice");
-        
+        List<Order> orders = new ArrayList<>(Arrays.asList(
+                new Order("Endre", "Thai Green Curry"),
+                new Order("Rohith", "Spicy Chicken Pad Thai"),
+                new Order("Ana", "Prawn Pad Thai"),
+                new Order("HarryD", "Chilli Chicken Fried Rice")));
+
         repo.save(new Restaurant(
-            "spicy-basil",
-            orders
+                "spicy-basil",
+                orders
         ));
     }
 
