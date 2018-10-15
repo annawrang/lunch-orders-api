@@ -2,12 +2,14 @@ package com.rungway.controllers;
 
 import com.rungway.domain.Order;
 import com.rungway.domain.Restaurant;
+import com.rungway.exceptions.BadRequestException;
 import com.rungway.exceptions.NotFoundException;
 import com.rungway.repositories.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -18,39 +20,46 @@ public class RestaurantsController {
 
 
     @GetMapping("/{slug}/orders")
-    public List<Order> orders(@PathVariable String slug) throws NotFoundException {
-        Restaurant restaurant = Optional.ofNullable(repo.findBySlug(slug)).orElseThrow(NotFoundException::new);
+    public List<Order> getOrders(@PathVariable String slug) throws NotFoundException {
+        Restaurant restaurant = repo.findBySlug(slug).orElseThrow(NotFoundException::new);
         return restaurant.getOrders();
     }
 
     @GetMapping("/orders/{name}")
-    public Map<String, Order> getOrdersForPerson(@PathVariable String name) {
-        Map<String, Order> orders = new HashMap<>();
-        for (Restaurant r : repo.findByOrders_Name(name)) {
-            int index = -1;
-            for (int i = 0; i < r.getOrders().size(); i++) {
-                if (r.getOrders().get(i).getName().equalsIgnoreCase(name)) {
-                    index = i;
-                }
-            }
-            orders.put(r.getSlug(), r.getOrders().get(index));
-        }
-        return orders;
+    public List<Order> getOrdersForPerson(@PathVariable String name) {
+        return repo.findByOrders_Name(name).stream()
+                .flatMap(r -> r.getOrders().stream())
+                .filter(o -> o.getName().equals(name)).collect(Collectors.toList());
     }
 
+    @PostMapping
+    public Restaurant addRestaurant(@RequestBody Restaurant restaurant) {
+        repo.save(restaurant);
+        return restaurant;
+    }
+
+    @PostMapping("/{slug}/orders")
+    public Order addOrder(@PathVariable String slug, @RequestBody Order order) throws NotFoundException, BadRequestException {
+        Restaurant restaurant = repo.findBySlug(slug).orElseThrow(NotFoundException::new);
+
+        if (restaurant.getOrders().stream().noneMatch(o -> o.getName().equalsIgnoreCase(order.getName()))) {
+            restaurant.getOrders().add(order);
+        } else {
+            throw new BadRequestException();
+        }
+        repo.save(restaurant);
+        return order;
+    }
 
     @PutMapping("/{slug}/orders")
-    public Order updateOrder(@PathVariable String slug, @RequestBody Order order) {
-        Restaurant restaurant = repo.findBySlug(slug);
-        if (restaurant != null) {
-            if (restaurant.getOrders().stream().noneMatch(o -> o.getName().equalsIgnoreCase(order.getName()))) {
-                restaurant.getOrders().add(order);
-            } else {
-                restaurant.getOrders().stream()
-                        .filter(o -> o.getName().equalsIgnoreCase(order.getName())).findAny().get().setDish(order.getDish());
-            }
+    public Order updateOrder(@PathVariable String slug, @RequestBody Order order) throws NotFoundException {
+        Restaurant restaurant = repo.findBySlug(slug).orElseThrow(NotFoundException::new);
+
+        if (restaurant.getOrders().stream().noneMatch(o -> o.getName().equalsIgnoreCase(order.getName()))) {
+            throw new NotFoundException();
         } else {
-            restaurant = new Restaurant(slug, new ArrayList<>(Arrays.asList(order)));
+            restaurant.getOrders().stream()
+                    .filter(o -> o.getName().equalsIgnoreCase(order.getName())).findAny().get().setDish(order.getDish());
         }
         repo.save(restaurant);
         return order;
